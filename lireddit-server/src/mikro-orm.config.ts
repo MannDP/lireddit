@@ -2,6 +2,7 @@ import { __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import { MikroORM } from "@mikro-orm/core";
 import path from "path";
+import { User } from "./entities/User";
 
 // putting this object here means that it can be accessed from the MikroORM CLI
 export default {
@@ -10,7 +11,7 @@ export default {
     pattern: /^[\w-]+\d+\.[tj]s$/, // regex pattern for the migration files
     disableForeignKeys: false,
   },
-  entities: [Post], // specify the DB tables here
+  entities: [Post, User], // specify the DB tables here
   dbName: "lireddit",
   user: "postgres",
   password: "postgres",
