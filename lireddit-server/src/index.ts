@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import mikroOrmConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
@@ -35,7 +35,7 @@ const main = async () => {
   // since apollo will use session middleware, this has to come first
   app.use(
     session({
-      name: "qid", // the name of the cookie
+      name: COOKIE_NAME, // the name of the cookie
       store: new RedisStore({ client: redisClient, disableTouch: true }), // disable touch because we will just persist sessions indefinitely and remove them as needed
       secret: "asldnaskjdnofjef", // TODO: this is sensitive and should ideally be hidden in an environment variable
       resave: false,
