@@ -13,6 +13,7 @@ import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
+import cors from "cors";
 
 const main = async () => {
   const orm = await MikroORM.init(mikroOrmConfig);
@@ -23,6 +24,13 @@ const main = async () => {
   const RedisStore = connectRedis(session);
   const redisClient = redis.createClient();
 
+  // apply cors to all routes
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
   // the order middleware is added to express is the order it will run in
   // since apollo will use session middleware, this has to come first
   app.use(
@@ -49,7 +57,7 @@ const main = async () => {
     // context object is accessible by all resolvers
     context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
   });
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log("server started on localhost:4000");
