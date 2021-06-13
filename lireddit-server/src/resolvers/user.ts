@@ -83,6 +83,18 @@ export class UserResolver {
       password: hashedPassword,
     });
     try {
+      // manually interact with DB to handle ORM errors
+      // const result = await (em as EntityManager)
+      //   .createQueryBuilder(User)
+      //   .getKnexQuery()
+      //   .insert({
+      //     username: options.username,
+      //     password: hashedPassword,
+      //     created_at: new Date(), // match the column name
+      //     updated_at: new Date(),
+      //   })
+      //   .returning("*");
+      // user = result[0];
       await em.persistAndFlush(user);
     } catch (err) {
       // duplicate username

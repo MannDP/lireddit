@@ -3,38 +3,30 @@ import { Form, Formik } from "formik";
 import { Box, Button } from "@chakra-ui/react";
 import { InputField } from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
-import { useMutation } from "urql";
+import { useRegisterMutation } from "../generated/graphql";
+import { toErrorMap } from "../utils/toErrorMap";
+import { useRouter } from "next/router";
 
 interface registerProps {}
 
-const REGISTER_MUT = `
-mutation Register($username: String!, $password: String!) {
-  register(options: { username: $username, password: $password }) {
-    errors {
-      field
-      message
-    }
-    user {
-      id
-      username
-    }
-  }
-}
-`;
-
 // since this component is under the "pages" directory, it automatically is given the route based on its name
 const Register: React.FC<registerProps> = ({}) => {
-  const [, register] = useMutation(REGISTER_MUT);
+  const router = useRouter();
+  const [, register] = useRegisterMutation();
 
   return (
     <Wrapper variant="small">
       <Formik
         initialValues={{ username: "", password: "" }}
-        onSubmit={async (values) => {
+        onSubmit={async (values, { setErrors }) => {
           // pass through object since the structure of "values", and the naming of the variables in the mutation query line up
           // need to return a Promise to update the isSubmitting variable we use in the submit button
           const response = await register(values);
-          // return response;
+          if (response.data?.register.errors) {
+            setErrors(toErrorMap(response.data.register.errors));
+          } else if (response.data?.register.user) {
+            router.push("/");
+          }
         }}
       >
         {({ isSubmitting }) => (
