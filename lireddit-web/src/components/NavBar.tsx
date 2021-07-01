@@ -3,12 +3,18 @@ import { Button, Flex, Link } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
+import { isServer } from "../utils/isServer";
 
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
-  const [{ data, fetching }] = useMeQuery();
+  const [{ data, fetching }] = useMeQuery({
+    // due to SSR, when the Next.js server attempts to execute this query
+    // it fails to get a user back because it does not have access to the cookie that the frontend has
+    // so disable this wasteful query in that context
+    pause: isServer(),
+  });
   let body = null;
   if (fetching) {
     // loading
